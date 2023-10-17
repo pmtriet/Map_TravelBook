@@ -60,11 +60,15 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0Wa-r8-ciw">
-                                <rect key="frame" x="0.0" y="302" width="393" height="476"/>
+                                <rect key="frame" x="0.0" y="302" width="393" height="479"/>
                                 <standardMapConfiguration key="preferredConfiguration"/>
                             </mapView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZUr-xo-xKV">
-                                <rect key="frame" x="166" y="783" width="61" height="35"/>
+                                <rect key="frame" x="121.66666666666669" y="786" width="150" height="35"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="35" id="9xY-I6-p3A"/>
+                                    <constraint firstAttribute="width" constant="150" id="kI0-4N-FeF"/>
+                                </constraints>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Save"/>
                                 <connections>
@@ -83,10 +87,10 @@
                             <constraint firstItem="0Wa-r8-ciw" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="LKL-0P-dS5"/>
                             <constraint firstItem="uZ7-QW-Xw4" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="60" id="MD2-8k-vgD"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Zyp-tp-rEI" secondAttribute="trailing" constant="60" id="VdR-RC-Fh1"/>
+                            <constraint firstItem="ZUr-xo-xKV" firstAttribute="top" secondItem="0Wa-r8-ciw" secondAttribute="bottom" constant="5" id="WbF-KM-YN4"/>
+                            <constraint firstItem="ZUr-xo-xKV" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" constant="3" id="aNR-Iy-CcO"/>
                             <constraint firstItem="uZ7-QW-Xw4" firstAttribute="top" secondItem="Zyp-tp-rEI" secondAttribute="bottom" constant="20" id="bqu-bp-SIu"/>
-                            <constraint firstItem="ZUr-xo-xKV" firstAttribute="top" secondItem="0Wa-r8-ciw" secondAttribute="bottom" constant="5" id="kO7-ER-wGO"/>
-                            <constraint firstItem="ZUr-xo-xKV" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="u7D-wT-DRJ"/>
-                            <constraint firstItem="ZUr-xo-xKV" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="166" id="vzX-qT-0JN"/>
+                            <constraint firstItem="ZUr-xo-xKV" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="vpJ-og-HXV"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="fA7-BV-rAs"/>
