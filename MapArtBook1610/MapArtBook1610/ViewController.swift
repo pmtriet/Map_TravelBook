@@ -12,11 +12,17 @@ import CoreData
 
 class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDelegate {
 
+    var managedObjectContext : NSManagedObjectContext!
+    
     @IBOutlet weak var nameTextField: UITextField!
     
     @IBOutlet weak var commentTextField: UITextField!
     
+    @IBOutlet weak var saveButtonClicked: UIButton!
     @IBOutlet weak var mapView: MKMapView!
+    
+    
+    
     var locationManager = CLLocationManager()
     var chosenLatitude = Double()
     var chosenLongitude = Double()
@@ -40,7 +46,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
         
         
         let gestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(chooseLocation(gestureRecognizer: )))
-        gestureRecognizer.minimumPressDuration = 3
+        gestureRecognizer.minimumPressDuration = 2
         mapView.addGestureRecognizer(gestureRecognizer)
         
         
@@ -57,6 +63,8 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
             let idString = selectedTitleId!.uuidString
             fetchRequest.predicate = NSPredicate(format: "id = %@", idString)
             fetchRequest.returnsObjectsAsFaults = false
+            
+//            saveButtonClicked.isHidden = true
             
             do {
                 let results = try context.fetch(fetchRequest)
@@ -88,6 +96,9 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
                                         commentTextField.text = annotationSubTitle
                                         
                                         
+                                        
+                                        
+                                        //zoom pin location when select place from table view
                                         locationManager.stopUpdatingLocation()
                                         let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
                                         let region = MKCoordinateRegion(center: coordinate, span: span)
@@ -108,7 +119,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
             }
             
         } else {
-            
+//            updateButton.isHidden = true
         }
     }
     
@@ -145,6 +156,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
         }
     }
     
+    //view detail pin  when user tap pin annotation
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         if annotation is MKUserLocation {
             return nil
@@ -168,6 +180,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
         return pinView
     }
 
+    //navigate to
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         if selectedTitle != "" {
             let requestLocation = CLLocation(latitude: annotationLatitude, longitude: annotationLongitude)
@@ -192,22 +205,53 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
     }
     
     @IBAction func saveButtonClicked(_ sender: Any) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let context = appDelegate.persistentContainer.viewContext
-        
-        let newPlace = NSEntityDescription.insertNewObject(forEntityName: "Places", into: context)
-        
-        newPlace.setValue(nameTextField.text, forKey: "title")
-        newPlace.setValue(commentTextField.text, forKey: "subtitle")
-        newPlace.setValue(chosenLatitude, forKey: "latitude")
-        newPlace.setValue(chosenLongitude, forKey: "longitude")
-        newPlace.setValue(UUID(), forKey: "id")
-        
-        do {
-            try context.save()
-            print("okay")
-        } catch {
-            print("error")
+        if selectedTitle != ""{
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let context = appDelegate.persistentContainer.viewContext
+//            let managedObjectContext : NSManagedObjectContext?
+            
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Places")
+            let idString = selectedTitleId!.uuidString
+            fetchRequest.predicate = NSPredicate(format: "id = %@", idString)
+            fetchRequest.returnsObjectsAsFaults = false
+            
+            //            saveButtonClicked.isHidden = true
+            
+            do {
+                let results = try context.fetch(fetchRequest)
+                if results.count > 0 {
+                    
+                for result in results as! [NSManagedObject] {
+                    result.setValue(nameTextField.text, forKey: "title")
+                    result.setValue(commentTextField.text, forKey: "subtitle")
+                        
+                }
+                    
+                try context.save()
+                    
+                }
+                }
+            catch {
+                print("error")
+            }
+        } else{
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            let context = appDelegate.persistentContainer.viewContext
+            
+            let newPlace = NSEntityDescription.insertNewObject(forEntityName: "Places", into: context)
+            
+            newPlace.setValue(nameTextField.text, forKey: "title")
+            newPlace.setValue(commentTextField.text, forKey: "subtitle")
+            newPlace.setValue(chosenLatitude, forKey: "latitude")
+            newPlace.setValue(chosenLongitude, forKey: "longitude")
+            newPlace.setValue(UUID(), forKey: "id")
+            
+            do {
+                try context.save()
+                print("okay")
+            } catch {
+                print("error")
+            }
         }
         
         NotificationCenter.default.post(name: NSNotification.Name("newPlace"), object: nil)
