@@ -11,11 +11,14 @@ import CoreData
 class ListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var tableView: UITableView!
-    var titleArray = [String]()
-    var idArray = [UUID]()
+//    var titleArray = [String]()
+//    var idArray = [UUID]()
+//    
+//    var chosenTitle = ""
+//    var chosenTitleId: UUID?
     
-    var chosenTitle = ""
-    var chosenTitleId: UUID?
+    var results = [NSManagedObject]()
+    var chosenObject: NSManagedObject?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,54 +44,43 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         request.returnsObjectsAsFaults = false
         
         do {
-            let results = try context.fetch(request)
+            results = try context.fetch(request) as! [NSManagedObject]
             
             if results.count > 0 {
-                self.idArray.removeAll(keepingCapacity: false)
-                self.titleArray.removeAll(keepingCapacity: false)
                 
-                
-                for result in results as! [NSManagedObject] {
-                    if let title = result.value(forKey: "title") as? String {
-                        self.titleArray.append(title)
-                    }
-                    if let id = result.value(forKey: "id") as? UUID {
-                        self.idArray.append(id)
-                    }
                     self.tableView.reloadData()
                 }
                 
             }
-        } catch {
+         catch {
             print("error")
         }
     }
     
     @objc func addButtonClick() {
-        chosenTitle = ""
+        chosenObject = nil
         performSegue(withIdentifier: "toDetailVC", sender: nil)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return idArray.count
+        return results.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
-        cell.textLabel?.text = titleArray[indexPath.row]
+        cell.textLabel?.text = results[indexPath.row].value(forKey: "title") as? String
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        chosenTitle = titleArray[indexPath.row]
-        chosenTitleId = idArray[indexPath.row]
+        chosenObject = results[indexPath.row]
         performSegue(withIdentifier: "toDetailVC", sender: nil)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "toDetailVC" {
             let destinationVC = segue.destination as! ViewController
-            destinationVC.selectedTitle = chosenTitle
-            destinationVC.selectedTitleId = chosenTitleId
+            destinationVC.selectedObject = chosenObject
+            
         }
     }
     
@@ -97,44 +89,29 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let context = appDelegate.persistentContainer.viewContext
             
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Places")
+//            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Places")
+//            
+//            let idString = idArray[indexPath.row].uuidString
+//            
+//            fetchRequest.predicate = NSPredicate(format: "id = %@", idString)
+//            fetchRequest.returnsObjectsAsFaults = false
             
-            let idString = idArray[indexPath.row].uuidString
             
-            fetchRequest.predicate = NSPredicate(format: "id = %@", idString)
-            fetchRequest.returnsObjectsAsFaults = false
-            
+                
+            context.delete(results[indexPath.row])
+            self.results.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .bottom)
             
             do {
-                let results = try context.fetch(fetchRequest)
-                if results.count > 0 {
-                    for result in results as! [NSManagedObject] {
-                        if let id = result.value(forKey: "id") as? UUID
-                        {
-                            if id == idArray[indexPath.row] {
-                                context.delete(result)
-                                titleArray.remove(at: indexPath.row)
-                                idArray.remove(at: indexPath.row)
-                                self.tableView.reloadData()
-                                
-                                do {
-                                    try context.save()
-                                } catch {
-                                    print("error")
-                                }
-                                
-                                break
-                            }
-                        }
-                    }
-                }
+                try context.save()
             } catch {
                 print("error")
             }
         }
     }
-    
-
-    
-
 }
+    
+
+    
+
+

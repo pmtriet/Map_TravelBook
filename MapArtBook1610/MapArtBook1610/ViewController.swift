@@ -24,16 +24,19 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
     
     
     var locationManager = CLLocationManager()
+    
+    
     var chosenLatitude = Double()
     var chosenLongitude = Double()
+    var chosenTitle = ""
+    var chosenSubTitle = ""
     
-    var selectedTitle = ""
-    var selectedTitleId: UUID?
+//    var annotationTitle = ""
+//    var annotationSubTitle = ""
+//    var annotationLatitude = Double()
+//    var annotationLongitude = Double()
     
-    var annotationTitle = ""
-    var annotationSubTitle = ""
-    var annotationLatitude = Double()
-    var annotationLongitude = Double()
+    var selectedObject: NSManagedObject?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,68 +58,92 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
         view.addGestureRecognizer(hideTapRecognizer)
         
         
-        if selectedTitle != "" {
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let context = appDelegate.persistentContainer.viewContext
+        if selectedObject != nil {
+//            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+//            let context = appDelegate.persistentContainer.viewContext
+//            
+//            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Places")
+//            let idString = selectedTitleId!.uuidString
+//            fetchRequest.predicate = NSPredicate(format: "id = %@", idString)
+//            fetchRequest.returnsObjectsAsFaults = false
+//            
+////            saveButtonClicked.isHidden = true
+//            
+//            do {
+//                let results = try context.fetch(fetchRequest)
+//                if results.count > 0 {
+//                    
+//                    for result in results as! [NSManagedObject] {
+//                        if let title = result.value(forKey: "title") as? String {
+//                            annotationTitle = title
+//                            
+//                            
+//                            if let subtitle = result.value(forKey: "subtitle") as? String {
+//                                annotationSubTitle = subtitle
+//                                
+//                                if let latitude = result.value(forKey: "latitude") as? Double {
+//                                    annotationLatitude = latitude
+//                                    
+//                                    if let longitude = result.value(forKey: "longitude") as? Double {
+//                                        annotationLongitude = longitude
+//                                        
+//                                        let annotation = MKPointAnnotation()
+//                                        annotation.title = annotationTitle
+//                                        annotation.subtitle = annotationSubTitle
+//                                        let coordinate = CLLocationCoordinate2D(latitude: annotationLatitude, longitude: annotationLongitude)
+//                                        annotation.coordinate = coordinate
+//                                        
+//                                        mapView.addAnnotation(annotation)
+//                                        
+//                                        nameTextField.text = annotationTitle
+//                                        commentTextField.text = annotationSubTitle
+//                                        
+//                                        
+//                                        
+//                                        
+//                                        //zoom pin location when select place from table view
+//                                        locationManager.stopUpdatingLocation()
+//                                        let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+//                                        let region = MKCoordinateRegion(center: coordinate, span: span)
+//                                        mapView.setRegion(region, animated: true)
+//                                    }
+//                                }
+//                                
+//                                
+//                            }
+//                        }
+//                        
+//                        
+//                        
+//                    }
+//                }
+//            } catch {
+//                print("error")
+//            }
+            chosenTitle = selectedObject?.value(forKey: "title") as! String
+            chosenSubTitle = selectedObject?.value(forKey: "subtitle") as! String
+            chosenLatitude = selectedObject?.value(forKey: "latitude") as! Double
+            chosenLongitude = selectedObject?.value(forKey: "longitude") as! Double
             
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Places")
-            let idString = selectedTitleId!.uuidString
-            fetchRequest.predicate = NSPredicate(format: "id = %@", idString)
-            fetchRequest.returnsObjectsAsFaults = false
             
-//            saveButtonClicked.isHidden = true
             
-            do {
-                let results = try context.fetch(fetchRequest)
-                if results.count > 0 {
-                    
-                    for result in results as! [NSManagedObject] {
-                        if let title = result.value(forKey: "title") as? String {
-                            annotationTitle = title
-                            
-                            
-                            if let subtitle = result.value(forKey: "subtitle") as? String {
-                                annotationSubTitle = subtitle
-                                
-                                if let latitude = result.value(forKey: "latitude") as? Double {
-                                    annotationLatitude = latitude
-                                    
-                                    if let longitude = result.value(forKey: "longitude") as? Double {
-                                        annotationLongitude = longitude
-                                        
-                                        let annotation = MKPointAnnotation()
-                                        annotation.title = annotationTitle
-                                        annotation.subtitle = annotationSubTitle
-                                        let coordinate = CLLocationCoordinate2D(latitude: annotationLatitude, longitude: annotationLongitude)
-                                        annotation.coordinate = coordinate
-                                        
-                                        mapView.addAnnotation(annotation)
-                                        
-                                        nameTextField.text = annotationTitle
-                                        commentTextField.text = annotationSubTitle
-                                        
-                                        
-                                        
-                                        
-                                        //zoom pin location when select place from table view
-                                        locationManager.stopUpdatingLocation()
-                                        let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-                                        let region = MKCoordinateRegion(center: coordinate, span: span)
-                                        mapView.setRegion(region, animated: true)
-                                    }
-                                }
-                                
-                                
-                            }
-                        }
-                        
-                        
-                        
-                    }
-                }
-            } catch {
-                print("error")
-            }
+            let annotation = MKPointAnnotation()
+            annotation.title = chosenTitle
+            annotation.subtitle = chosenSubTitle
+            let coordinate = CLLocationCoordinate2D(latitude: chosenLatitude, longitude: chosenLongitude)
+            annotation.coordinate = coordinate
+            mapView.addAnnotation(annotation)
+            
+            
+            nameTextField.text = chosenTitle
+            commentTextField.text = chosenSubTitle
+            
+            
+            //zoom pin location when select place from table view
+            locationManager.stopUpdatingLocation()
+            let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            let region = MKCoordinateRegion(center: coordinate, span: span)
+            mapView.setRegion(region, animated: true)
             
         } else {
 //            updateButton.isHidden = true
@@ -146,7 +173,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if selectedTitle == "" {
+        if selectedObject == nil {
             let location = CLLocationCoordinate2D(latitude: locations[0].coordinate.latitude, longitude: locations[0].coordinate.longitude)
             let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
             let region = MKCoordinateRegion(center: location, span: span)
@@ -182,8 +209,8 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
 
     //navigate to
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-        if selectedTitle != "" {
-            let requestLocation = CLLocation(latitude: annotationLatitude, longitude: annotationLongitude)
+        if selectedObject != nil {
+            let requestLocation = CLLocation(latitude: chosenLatitude, longitude: chosenLongitude)
             
             
             CLGeocoder().reverseGeocodeLocation(requestLocation) { placemarks, error in
@@ -195,7 +222,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
                         
                         let newPlaceMark = MKPlacemark(placemark: placemark[0])
                         let item = MKMapItem(placemark: newPlaceMark)
-                        item.name = self.annotationTitle
+                        item.name = self.chosenTitle
                         let launchOptions = [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving]
                         item.openInMaps(launchOptions: launchOptions)
                     }
@@ -205,41 +232,45 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
     }
     
     @IBAction func saveButtonClicked(_ sender: Any) {
-        if selectedTitle != ""{
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let context = appDelegate.persistentContainer.viewContext
-//            let managedObjectContext : NSManagedObjectContext?
-            
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Places")
-            let idString = selectedTitleId!.uuidString
-            fetchRequest.predicate = NSPredicate(format: "id = %@", idString)
-            fetchRequest.returnsObjectsAsFaults = false
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                
+        let context = appDelegate.persistentContainer.viewContext
+        if selectedObject != nil {
+//            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+//            let context = appDelegate.persistentContainer.viewContext
+////            let managedObjectContext : NSManagedObjectContext?
+//            
+//            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Places")
+//            let idString = selectedTitleId!.uuidString
+//            fetchRequest.predicate = NSPredicate(format: "id = %@", idString)
+//            fetchRequest.returnsObjectsAsFaults = false
             
             //            saveButtonClicked.isHidden = true
             
+            selectedObject?.setValue(nameTextField.text, forKey: "title")
+            selectedObject?.setValue(commentTextField.text, forKey: "subtitle")
+            selectedObject?.setValue(chosenLatitude, forKey: "latitude")
+            selectedObject?.setValue(chosenLongitude, forKey: "longitude")
+            
             do {
-                let results = try context.fetch(fetchRequest)
-                if results.count > 0 {
-                    
-                for result in results as! [NSManagedObject] {
-                    result.setValue(nameTextField.text, forKey: "title")
-                    result.setValue(commentTextField.text, forKey: "subtitle")
-                        
-                }
+//                let results = try context.fetch(fetchRequest)
+//                if results.count > 0 {
+//                    
+//                for result in results as! [NSManagedObject] {
+//                    result.setValue(nameTextField.text, forKey: "title")
+//                    result.setValue(commentTextField.text, forKey: "subtitle")
+//                        
+//                }
                     
                 try context.save()
-                    
-                }
-                }
-            catch {
+                } catch {
                 print("error")
             }
-        } else{
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            let context = appDelegate.persistentContainer.viewContext
+        } else {
             
             let newPlace = NSEntityDescription.insertNewObject(forEntityName: "Places", into: context)
             
+            newPlace.setValue(UUID(), forKey: "id")
             newPlace.setValue(nameTextField.text, forKey: "title")
             newPlace.setValue(commentTextField.text, forKey: "subtitle")
             newPlace.setValue(chosenLatitude, forKey: "latitude")
