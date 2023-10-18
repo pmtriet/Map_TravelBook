@@ -24,6 +24,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
     
     
     var locationManager = CLLocationManager()
+    let annotation = MKPointAnnotation()
     
     
     var chosenLatitude = Double()
@@ -37,6 +38,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
 //    var annotationLongitude = Double()
     
     var selectedObject: NSManagedObject?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -127,7 +129,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
             
             
             
-            let annotation = MKPointAnnotation()
+            
             annotation.title = chosenTitle
             annotation.subtitle = chosenSubTitle
             let coordinate = CLLocationCoordinate2D(latitude: chosenLatitude, longitude: chosenLongitude)
@@ -164,7 +166,7 @@ class ViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDele
             chosenLatitude = touchedCoordinates.latitude
             chosenLongitude = touchedCoordinates.longitude
             
-            let annotation = MKPointAnnotation()
+           
             annotation.coordinate = touchedCoordinates
             annotation.title = nameTextField.text
             annotation.subtitle = commentTextField.text
